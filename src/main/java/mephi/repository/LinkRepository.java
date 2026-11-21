@@ -47,11 +47,14 @@ public class LinkRepository extends FileRepository<UUID, Link> {
         return data.values()
                 .stream()
                 .filter(link -> link.userId().equals(userId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public List<Link> findAll() {
-        return List.copyOf(data.values());
+    public List<Link> getAllExpired() {
+        return data.values()
+                .stream()
+                .filter(Link::isExpired)
+                .toList();
     }
 
     @Override
