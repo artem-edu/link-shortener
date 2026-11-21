@@ -1,17 +1,28 @@
 package mephi.repository;
 
+import com.google.gson.reflect.TypeToken;
+import mephi.core.FileRepository;
 import mephi.model.User;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserRepository {
-    private static final Map<UUID, User> data = new HashMap<>();
+public class UserRepository extends FileRepository<UUID, User> {
+    public UserRepository() {
+        this("db/users.json");
+    }
+
+    public UserRepository(String fileDb) {
+        super(fileDb, new TypeToken<HashMap<UUID, User>>() {
+        });
+        loadFromFile();
+    }
 
     public User save(User user) {
         data.put(user.id(), user);
+
+        saveToFile();
         return user;
     }
 
