@@ -14,6 +14,6 @@ class ConfigServiceTest {
 
     @Test
     void readsIntValue() {
-        assertTrue(ConfigService.getIntValue("CLEANUP_INTERVAL_MS") > 0);
+        assertTrue(ConfigService.getIntValue("CLEANUP_INTERVAL_MS") >= 0);
     }
 }

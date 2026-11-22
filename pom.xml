@@ -63,7 +63,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.12</version>
                 <configuration>
                     <includes>
                         <include>mephi/service/**/*</include>
@@ -84,9 +84,16 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <includes>
+                                <include>mephi.service.*</include>
+                                <include>mephi.repository.*</include>
+                            </includes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>report</id>
@@ -96,7 +103,8 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>check</id>
+                        <id>jacoco-check</id>
+                        <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
