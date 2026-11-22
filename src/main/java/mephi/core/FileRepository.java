@@ -3,7 +3,6 @@ package mephi.core;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -13,51 +12,49 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class FileRepository<K, V> {
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    protected final Map<K, V> data = new HashMap<>();
-    protected final String fileDb;
-    private final Type mapType;
+  protected final Map<K, V> data = new HashMap<>();
+  protected final String fileDb;
+  private final Type mapType;
 
-    protected FileRepository(String fileDb, TypeToken<HashMap<K, V>> typeToken) {
-        this.fileDb = fileDb;
-        this.mapType = typeToken.getType();
+  protected FileRepository(String fileDb, TypeToken<HashMap<K, V>> typeToken) {
+    this.fileDb = fileDb;
+    this.mapType = typeToken.getType();
+  }
+
+  protected synchronized void saveToFile() {
+    File file = new File(fileDb);
+    File parentDir = file.getParentFile();
+    if (parentDir != null && !parentDir.exists()) {
+      parentDir.mkdirs();
     }
 
-    protected synchronized void saveToFile() {
-        File file = new File(fileDb);
-        File parentDir = file.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs();
-        }
+    try (FileWriter writer = new FileWriter(file)) {
+      GSON.toJson(data, writer);
+    } catch (IOException e) {
+      System.err.println("Ошибка при сохранении данных в файл " + fileDb + ": " + e.getMessage());
+    }
+  }
 
-        try (FileWriter writer = new FileWriter(file)) {
-            GSON.toJson(data, writer);
-        } catch (IOException e) {
-            System.err.println("Ошибка при сохранении данных в файл " + fileDb + ": " + e.getMessage());
-        }
+  protected void loadFromFile() {
+    File file = new File(fileDb);
+
+    if (!file.exists()) {
+      return;
     }
 
+    try (FileReader reader = new FileReader(file)) {
+      Map<K, V> loadedData = GSON.fromJson(reader, mapType);
 
-    protected void loadFromFile() {
-        File file = new File(fileDb);
-
-        if (!file.exists()) {
-            return;
-        }
-
-        try (FileReader reader = new FileReader(file)) {
-            Map<K, V> loadedData = GSON.fromJson(reader, mapType);
-
-            if (loadedData != null) {
-                data.putAll(loadedData);
-                afterLoad(loadedData);
-            }
-        } catch (IOException e) {
-            System.err.println("Ошибка при чтении данных из файла " + fileDb + ": " + e.getMessage());
-        }
+      if (loadedData != null) {
+        data.putAll(loadedData);
+        afterLoad(loadedData);
+      }
+    } catch (IOException e) {
+      System.err.println("Ошибка при чтении данных из файла " + fileDb + ": " + e.getMessage());
     }
+  }
 
-    protected void afterLoad(Map<K, V> loadedData) {
-    }
+  protected void afterLoad(Map<K, V> loadedData) {}
 }

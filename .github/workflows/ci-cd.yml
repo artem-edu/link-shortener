@@ -47,7 +47,7 @@ jobs:
           cache: 'maven'
 
       - name: Run Checkstyle
-        run: mvn checkstyle:check
+        run: mvn spotless:check
 
       - name: Run tests and Check coverage (min 50%)
         run: mvn test jacoco:check
